@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        input[type="number"] {
+            padding: 8px;
+            width: 100px;
+        }
+        select {
+            padding: 8px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Currency Converter</h2>
+    <div>
+        <input type="number" id="amount" placeholder="Amount" step="any">
+        <select id="fromCurrency">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+            <option value="JPY">JPY</option>
+            <option value="CAD">CAD</option>
+            <option value="AUD">AUD</option>
+            <option value="CHF">CHF</option>
+            <option value="CNY">CNY</option>
+            <option value="INR">INR</option>
+            <option value="SGD">SGD</option>
+            <option value="HKD">HKD</option>
+            <option value="NZD">NZD</option>
+            <option value="SEK">SEK</option>
+            <option value="KRW">KRW</option>
+            <option value="MXN">MXN</option>
+            <option value="BRL">BRL</option>
+            <option value="RUB">RUB</option>
+        </select>
+        <select id="toCurrency">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+            <option value="JPY">JPY</option>
+            <option value="CAD">CAD</option>
+            <option value="AUD">AUD</option>
+            <option value="CHF">CHF</option>
+            <option value="CNY">CNY</option>
+            <option value="INR">INR</option>
+            <option value="SGD">SGD</option>
+            <option value="HKD">HKD</option>
+            <option value="NZD">NZD</option>
+            <option value="SEK">SEK</option>
+            <option value="KRW">KRW</option>
+            <option value="MXN">MXN</option>
+            <option value="BRL">BRL</option>
+            <option value="RUB">RUB</option>
+        </select>
+        <button onclick="convertCurrency()">Convert</button>
+    </div>
+    <div id="result"></div>
+
+    <script>
+        var exchangeRates = {
+            USD: { EUR: 0.85, GBP: 0.76, JPY: 110.46, CAD: 1.25, AUD: 1.32, CHF: 0.92, CNY: 6.48, INR: 74.44, SGD: 1.36, HKD: 7.77, NZD: 1.42, SEK: 8.82, KRW: 1174.08, MXN: 19.86, BRL: 5.22, RUB: 75.65 },
+            EUR: { USD: 1.18, GBP: 0.89, JPY: 129.78, CAD: 1.46, AUD: 1.55, CHF: 1.08, CNY: 7.57, INR: 87.39, SGD: 1.60, HKD: 9.12, NZD: 1.66, SEK: 10.33, KRW: 1376.59, MXN: 23.28, BRL: 6.12, RUB: 88.78 },
+            GBP: { USD: 1.32, EUR: 1.12, JPY: 145.65, CAD: 1.64, AUD: 1.74, CHF: 1.21, CNY: 8.45, INR: 97.61, SGD: 1.78, HKD: 10.15, NZD: 1.85, SEK: 11.51, KRW: 1531.54, MXN: 25.88, BRL: 6.80, RUB: 98.42 },
+            JPY: { USD: 0.0091, EUR: 0.0077, GBP: 0.0069, CAD: 0.011, AUD: 0.0116, CHF: 0.0081, CNY: 0.057, INR: 0.66, SGD: 0.012, HKD: 0.068, NZD: 0.012, SEK: 0.076, KRW: 10.13, MXN: 0.17, BRL: 0.044, RUB: 0.64 },
+            CAD: { USD: 0.80, EUR: 0.68, GBP: 0.61, JPY: 87.36, AUD: 1.06, CHF: 0.74, CNY: 5.19, INR: 59.93, SGD: 1.10, HKD: 6.28, NZD: 1.15, SEK: 7.17, KRW: 953.91, MXN: 16.11, BRL: 4.23, RUB: 61.26 },
+            AUD: { USD: 0.76, EUR: 0.64, GBP: 0.57, JPY: 85.99, CAD: 0.94, CHF: 0.69, CNY: 4.84, INR: 55.91, SGD: 1.03, HKD: 5.88, NZD: 1.08, SEK: 6.72, KRW: 894.35, MXN: 15.11, BRL: 3.97, RUB: 57.45 },
+            CHF: { USD: 1.09, EUR: 0.92, GBP: 0.83, JPY: 123.44, CAD: 1.35, AUD: 1.45, CNY: 7.84, INR: 90.47, SGD: 1.66, HKD: 9.46, NZD: 1.73, SEK: 10.76, KRW: 1431.51, MXN: 24.17, BRL: 6.36, RUB: 92.02 },
+            CNY: { USD: 0.15, EUR: 0.13, GBP: 0.12, JPY: 17.58, CAD: 0.19, AUD: 0.21, CHF: 0.13, INR: 11.54, SGD: 0.21, HKD: 1.19, NZD: 0.22, SEK: 1.36, KRW: 181.02, MXN: 3.06, BRL: 0.80, RUB: 11.56 },
+            INR: { USD: 0.013, EUR: 0.011, GBP: 0.010, JPY: 1.51, CAD: 0.017, AUD: 0.018, CHF: 0.011, CNY: 0.087, SGD: 0.019, HKD: 0.11, NZD: 0.020, SEK: 0.12, KRW: 16.00, MXN: 0.27, BRL: 0.071, RUB: 1.02 },
+            SGD: { USD: 0.74, EUR: 0.62, GBP: 0.56, JPY: 82.50, CAD: 0.91, AUD: 0.99, CHF: 0.60, CNY: 4.70, INR: 52.88, HKD: 5.71, NZD: 1.04, SEK: 6.50, KRW: 865.29, MXN: 14.62, BRL: 3.84, RUB: 55.67 },
+            HKD: { USD: 0.13, EUR: 0.11, GBP: 0.10, JPY: 14.62, CAD: 0.16, AUD: 0.17, CHF: 0.11, CNY: 0.84, INR: 9.65, SGD: 0.18, NZD: 0.17, SEK: 1.04, KRW: 138.73, MXN: 2.35, BRL: 0.62, RUB: 8.93 },
+            NZD: { USD: 0.71, EUR: 0.60, GBP: 0.54, JPY: 79.29, CAD: 0.87, AUD: 0.93, CHF: 0.58, CNY: 4.12, INR: 47.79, SGD: 0.96, HKD: 5.71, SEK: 6.25, KRW: 832.18, MXN: 14.06, BRL: 3.70, RUB: 53.56 },
+            SEK: { USD: 0.11, EUR: 0.10, GBP: 0.09, JPY: 11.66, CAD: 0.14, AUD: 0.15, CHF: 0.09, CNY: 0.74, INR: 8.43, SGD: 0.15, HKD: 0.96, NZD: 0.16, KRW: 132.82, MXN: 2.25, BRL: 0.59, RUB: 8.50 },
+            KRW: { USD: 0.00085, EUR: 0.00073, GBP: 0.00065, JPY: 0.099, CAD: 0.001, AUD: 0.0011, CHF: 0.0007, CNY: 0.0055, INR: 0.062, SGD: 0.0012, HKD: 0.0072, NZD: 0.0012, SEK: 0.0075, MXN: 0.017, BRL: 0.0045, RUB: 0.065 },
+            MXN: { USD: 0.050, EUR: 0.043, GBP: 0.039, JPY: 5.77, CAD: 0.062, AUD: 0.067, CHF: 0.041, CNY: 0.326, INR: 3.76, SGD: 0.070, HKD: 0.45, NZD: 0.071, SEK: 0.44, KRW: 58.16, BRL: 0.26, RUB: 14.43 },
+            BRL: { USD: 0.19, EUR: 0.16, GBP: 0.14, JPY: 20.41, CAD: 0.23, AUD: 0.25, CHF: 0.15, CNY: 1.24, INR: 14.23, SGD: 0.26, HKD: 1.49, NZD: 0.27, SEK: 1.71, KRW: 227.58, MXN: 3.94, RUB: 14.47 },
+            RUB: { USD: 0.013, EUR: 0.011, GBP: 0.010, JPY: 1.56, CAD: 0.016, AUD: 0.017, CHF: 0.011, CNY: 0.087, INR: 1.02, SGD: 0.018, HKD: 0.11, NZD: 0.019, SEK: 0.12, KRW: 15.19, MXN: 0.069, BRL: 0.069 }
+            // Add more currencies and rates as needed
+        };
+
+        function convertCurrency() {
+            var amount = parseFloat(document.getElementById('amount').value);
+            var fromCurrency = document.getElementById('fromCurrency').value;
+            var toCurrency = document.getElementById('toCurrency').value;
+
+            var conversionRate = exchangeRates[fromCurrency][toCurrency];
+            var convertedAmount = amount * conversionRate;
+
+            document.getElementById('result').innerHTML = `${amount} ${fromCurrency} is equal to ${convertedAmount.toFixed(2)} ${toCurrency}`;
+        }
+    </script>
+</body>
+</html>
